@@ -43,7 +43,7 @@ class TodoListController extends Controller
         return view('ToDo_List.member_view',compact('member_view'));
     }
     public function member_delete($id){
-        $member_delete=TodoList::find($id);
+        $member_delete = TodoList::find($id);
         $member_delete->delete();
         return back();
     }
