@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('todo_lists', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
+            $table->longText('description')->nullable();
             $table->string('email')->nullable();
             $table->string('marital_status')->nullable();
             $table->string('phone')->nullable();

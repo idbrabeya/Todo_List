@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 
 class TodoListController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function todo_list_create(){
         return view('ToDo_List.ToDo_Create');
     }

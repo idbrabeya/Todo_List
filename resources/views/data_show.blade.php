@@ -43,6 +43,8 @@
                                  <td>
                                    <a href="{{route('info.edit',$datashow->id)}}" class="btn btn-info btn-sm">Edit</a>
                                    <button type="button" class="btn btn-danger btn-sm deletedata" data-id="{{$datashow->id}}" >Delete</button>
+                                   <a href="" class="btn btn-warning btn-sm">Add More</a>
+
                                  </td>
                                </tr>
                             @empty

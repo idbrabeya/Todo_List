@@ -30,6 +30,7 @@
                                    <a href="{{route('member.edit',$all_list_members->id)}}" class="btn btn-info btn-sm">Edit</a>
                                    <a href="{{route('member.view',$all_list_members->id)}}" class="btn btn-success btn-sm">View</a>
                                    <a href="{{route('member.delete',$all_list_members->id)}}" class="btn btn-danger btn-sm" >Delete</a>
+                                   <a href="" class="btn btn-warning btn-sm">Add_More</a>
                                  </td>
                                </tr>
                             @empty
