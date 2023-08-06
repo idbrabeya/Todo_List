@@ -39,7 +39,6 @@ Route::get('dependent/drop',[DependencyController::class,'dependent_drop'])->nam
 Route::get('get_state',[DependencyController::class,'get_state'])->name('get.state');
 Route::get('get_city',[DependencyController::class,'get_city'])->name('get.city');
 
-
 // todo list
 
 Route::get('/todo/list/create',[TodoListController::class,'todo_list_create'])->name('todo.list');
@@ -49,3 +48,5 @@ Route::get('/member/edit/{id}',[TodoListController::class,'member_edit'])->name(
 Route::post('/member/update/{id}',[TodoListController::class,'member_update'])->name('member.update');
 Route::get('/member/view/{id}',[TodoListController::class,'member_view'])->name('member.view');
 Route::get('/member/delete/{id}',[TodoListController::class,'member_delete'])->name('member.delete');
+
+Route::get('/todo/edit/{id}',[TodoListController::class,'todo_edit'])->name('todo.edit');

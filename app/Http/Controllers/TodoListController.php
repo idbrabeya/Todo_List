@@ -11,12 +11,14 @@ class TodoListController extends Controller
         $this->middleware('auth');
     }
     public function todo_list_create(){
-        return view('ToDo_List.ToDo_Create');
+        $todo_show=TodoList::all();
+        return view('ToDo_List.ToDo_Create',compact('todo_show'));
     }
     
     public function todolist_insert(Request $request){
        $Todoinsert=new TodoList;
        $Todoinsert->name =$request->name;
+       $Todoinsert->description =$request->description;
        $Todoinsert->email =$request->email;
        $Todoinsert->marital_status=$request->marital_status;
        $Todoinsert->phone =$request->phone;
@@ -31,6 +33,10 @@ class TodoListController extends Controller
     public function member_edit($id){
      $member_edit= TodoList::findOrFail($id);
      return view('ToDo_List.member_edit',compact('member_edit'));
+    }
+    public function todo_edit($id){
+        $todo_edit = TodoList::findOrFail($id);
+        return view('ToDo_List.todo_edit',compact('todo_edit'));
     }
     public function member_update(Request $request, $id){
         // dd($request->all());
