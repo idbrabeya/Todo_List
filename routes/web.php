@@ -50,3 +50,6 @@ Route::get('/member/view/{id}',[TodoListController::class,'member_view'])->name(
 Route::get('/member/delete/{id}',[TodoListController::class,'member_delete'])->name('member.delete');
 
 Route::get('/todo/edit/{id}',[TodoListController::class,'todo_edit'])->name('todo.edit');
+Route::post('/todo/update/{id}',[TodoListController::class,'todo_update'])->name('todo_update');
+Route::get('/todo/delete/{id}',[TodoListController::class,'todo_delete'])->name('todo_delete');
+Route::get('/todo/view/{id}',[TodoListController::class,'todo_view'])->name('todo_view');

@@ -10,15 +10,15 @@
                 </div>
 
                 <div class="card-body">
-                  <form method="post" action="" enctype="multipart/form-data">
+                  <form method="post" action="{{route('todo_update',$todo_edit->id)}}">
                     @csrf
                     <div class="mb-3">
                       <label for="" class="form-label">Title</label>
-                      <input type="text" class="form-control" name="name" >
+                      <input type="text" class="form-control" name="name" value="{{$todo_edit->name}}">
                     </div>
                     <div class="mb-3">
                       <label for="" class="form-label">Description</label>
-                      <textarea name="description" id="" cols="40"></textarea>
+                      <textarea name="description" id="" cols="60" >{{$todo_edit->description}}</textarea>
                     </div>
                     {{-- <div class="mb-3">
                         <label for="" class="form-label">Marital Status</label>

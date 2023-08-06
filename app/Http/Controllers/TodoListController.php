@@ -38,6 +38,25 @@ class TodoListController extends Controller
         $todo_edit = TodoList::findOrFail($id);
         return view('ToDo_List.todo_edit',compact('todo_edit'));
     }
+    public function todo_update(Request $request,$id){
+        $todo_update=ToDoList::findOrFail($id);
+        $todo_update->name=$request->name;
+        $todo_update->description =$request->description ;
+        $todo_update->save();
+        return redirect()->route('todo.list');
+
+    }
+
+    public function todo_delete($id){
+        $todo_delete=TodoList::findOrFail($id);
+        $todo_delete->delete();
+        return back();
+    }
+
+    public function todo_view($id){
+       $todo_view = TodoList::findOrFail($id);
+       return view('Todo_List.todo_view',compact('todo_view'));
+    }
     public function member_update(Request $request, $id){
         // dd($request->all());
         $member_update = TodoList::findOrFail($id);

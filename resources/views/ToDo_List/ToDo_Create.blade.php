@@ -7,7 +7,7 @@
             <div class="card">
                 <div class="card-header bg-info justify-content-between d-flex">
                     <h4>TODO CREATE</h4>
-                    <a type="button" href="{{route('all.member')}}" class="btn btn-warning">ToDo</a>
+                    {{-- <a type="button" href="{{route('all.member')}}" class="btn btn-warning">ToDo</a> --}}
                 </div>
 
                 <div class="card-body">
@@ -72,8 +72,8 @@
                         <td>{{$todo->description}}</td>
                         <td>
                           <a href="{{route('todo.edit', $todo->id) }}" class="btn btn-info btn-sm">Edit</a>
-                          <button type="button" class="btn btn-danger btn-sm deletedata">Delete</button>
-                          <a href="" class="btn btn-warning btn-sm">View</a>
+                          <a href="{{route('todo_delete', $todo->id) }}"  class="btn btn-danger btn-sm">Delete</a>
+                          <a href="{{route('todo_view',$todo->id)}}" class="btn btn-warning btn-sm">View</a>
                         </td>
                       </tr>
                       @empty
