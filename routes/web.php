@@ -53,3 +53,13 @@ Route::get('/todo/edit/{id}',[TodoListController::class,'todo_edit'])->name('tod
 Route::post('/todo/update/{id}',[TodoListController::class,'todo_update'])->name('todo_update');
 Route::get('/todo/delete/{id}',[TodoListController::class,'todo_delete'])->name('todo_delete');
 Route::get('/todo/view/{id}',[TodoListController::class,'todo_view'])->name('todo_view');
+
+// task
+
+Route::post('/task/list/insert',[TodoListController::class,'task_list_insert'])->name('task.list.insert');
+Route::get('/task/edit/{id}',[TodoListController::class,'task_edit'])->name('task.edit');
+Route::post('/task/update/{id}',[TodoListController::class,'task_update'])->name('task.update');
+Route::get('/task/delete/{id}',[TodoListController::class,'task_delete'])->name('task.delete');
+Route::get('/task/view/{id}',[TodoListController::class,'task_view'])->name('task_view');
+Route::get('/todo/list/view',[TodoListController::class,'todo_list_view'])->name('todo.list.view');
+
