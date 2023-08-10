@@ -12,7 +12,9 @@ class Task extends Model
     protected $fillable=[
         'status',
         'prioriti',
-        'todo_id'
+        'todo_id',
+        'start_date',
+        'end_date'
     ];
     public function todorelationtotask(){
         return $this->belongsTo(TodoList::class,'todo_id','id');

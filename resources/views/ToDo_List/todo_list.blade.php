@@ -23,22 +23,29 @@
                             <td>{{ $key+1 }}</td>
                             <td>{{$todo_list_views->todorelationtotask->name  }}</td>
                             <td>
-                            @if ($todo_list_views->status =='completed')<span class="badge bg-success">{{ $todo_list_views->status }}</span>
-                             @elseif ($todo_list_views->status =='progress')<span class="badge bg-warning">{{ $todo_list_views->status }}</span>
-                            @else
-                            <span class="badge bg-danger">{{ $todo_list_views->status }}</span>
-                            @endif
+                              {{-- @if ($todo_list_views->status =='completed')<span class="badge bg-success">{{ $todo_list_views->status }}</span>
+                              @elseif ($todo_list_views->status =='progress')<span class="badge bg-warning">{{ $todo_list_views->status }}</span>
+                             @else
+                             <span class="badge bg-danger">{{ $todo_list_views->status }}</span>
+                             @endif --}}
 
-
+                           
+            
+                             <span id="statusBadge{{ $key }}" class="badge
+                             @if ($todo_list_views->status == 'completed') bg-success
+                             @elseif ($todo_list_views->status == 'progress') bg-warning
+                             @else bg-danger @endif">
+                             {{ $todo_list_views->status }}
+                         </span>
+                         <select onchange="updateStatus({{ $key }}, this.value)">
+                             <option value="completed">Completed</option>
+                             <option value="progress">In Progress</option>
+                             <option value="Not_Started">Not Started</option>
+                         </select>
                             </td>
-
-
                           </tr>
                            @endforeach
-                           
-
                            {{--{{$all_contact_tasks->status  }} --}}
-
 
                         </tbody>
                       </table>
@@ -47,4 +54,20 @@
           </div>
       </div>
   </div>
+  <script>
+    function updateStatus(key, selectedValue) {
+        var statusBadge = document.getElementById("statusBadge" + key);
+        statusBadge.textContent = selectedValue;
+    
+        if (selectedValue == 'completed') {
+            statusBadge.className = "badge bg-success";
+        } else if (selectedValue == 'progress') {
+            statusBadge.className = "badge bg-warning";
+        } else {
+            statusBadge.className = "badge bg-danger";
+        }
+    
+        // Here, you can also make an AJAX request to update the status on the server if needed.
+    }
+    </script>
 @endsection

@@ -14,7 +14,13 @@ class TodoListController extends Controller
     }
     public function todo_list_create(){
         $todo_show=TodoList::all();
-        $task_show=Task::all();
+        if (auth()->user()->is_admin==1) {
+            $task_show=Task::all();
+        }  else{
+            $task_show=Task::where('user_id',Auth()->user()->id)->get();
+        }
+        
+
         return view('ToDo_List.ToDo_Create',compact('todo_show','task_show'));
     }
     
@@ -57,8 +63,15 @@ class TodoListController extends Controller
 
     public function todo_delete($id){
         
-        Task::where('todo_id',$id)->delete();
-        TodoList::findOrFail($id)->delete();
+      $tast_id=Task::where('todo_id',$id)->first();
+      
+        if($tast_id==null){
+            TodoList::findOrFail($id)->delete();
+        }else{
+            // $tast_id->delete();
+            return back()->with('message','opps!this item not delete!');
+        }
+       
         // $todo_delete=Task::where('todo_id',$todo_delete->id)->delete();
         // $todo_delete->delete();
         return back();
@@ -70,11 +83,15 @@ class TodoListController extends Controller
     }
 
     public function task_list_insert(Request $request){
-        // dd($request->all());
+        $user_id=auth()->user()->id;
+      
         $task_insert = new Task;
         $task_insert->todo_id  = $request->todo_id;
+        $task_insert->user_id  = $user_id;
         $task_insert->status  = $request->status ;
         $task_insert->prioriti = $request->prioriti;
+        $task_insert->start_date = $request->start_date;
+        $task_insert->end_date = $request->end_date;
         $task_insert->save();
         return back();
 

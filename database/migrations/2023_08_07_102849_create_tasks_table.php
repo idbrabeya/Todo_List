@@ -14,8 +14,11 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->integer('todo_id');
+            $table->boolean('user_id');
             $table->string('status');
             $table->string('prioriti')->nullable();
+            $table->string('start_date')->nullable();
+            $table->string('end_date')->nullable();
             $table->timestamps();
         });
     }

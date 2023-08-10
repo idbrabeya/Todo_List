@@ -17,9 +17,16 @@
                       <label for="" class="form-label">Title</label>
                       <input type="text" class="form-control" name="name" >
                     </div>
+
+                    @if($errors->has('name'))
+                   <span class="text-danger">
+                  {{$errors->first('name')}}
+                   </span>
+                    @endif
+
                     <div class="mb-3">
                       <label for="" class="form-label">Description</label>
-                      <textarea name="description" id="" cols="40"></textarea>
+                      <textarea name="description" id="" cols="40" class="form-control"></textarea>
                     </div>
                     {{-- <div class="mb-3">
                         <label for="" class="form-label">Marital Status</label>
@@ -104,7 +111,7 @@
                     @csrf
                     <div class="mb-3">
                       <label for="" class="form-label">Todo Name</label>
-                     <select name="todo_id" id="" class="form-control">
+                     <select name="todo_id" id="" class="form-control form-select">
                       <option value="" selected>select</option>
                       @foreach ($todo_show as $todo_shows)
                       <option value="{{$todo_shows->id}}">{{$todo_shows->name }}</option>
@@ -130,7 +137,20 @@
                        <option value="low">Low</option>
                      </select>
                     </div>
-       
+                      <div class="row">
+                        <div class="col-6">
+                          <div class="mb-3">
+                            <label for="" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" name="start_date" >
+                          </div>
+                        </div>
+                        <div class="col-6">
+                          <div class="mb-3">
+                            <label for="" class="form-label">End Date</label>
+                            <input type="date" class="form-control" name="end_date" >
+                          </div>
+                        </div>
+                      </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                   </form>
              </div>
@@ -152,6 +172,7 @@
                       <th >Todo Name</th>
                       <th >Status</th>
                       <th >Prioriti</th>
+                      <th >Target Date</th>
                       <th >Action</th>
                     </tr>
                   </thead>
@@ -162,6 +183,7 @@
                       <td>{{$task_shows->todorelationtotask->name}}</td>
                       <td>{{$task_shows->status}}</td>
                       <td>{{$task_shows->prioriti}}</td>
+                      <td>{{$task_shows->end_date}}</td>
                      
                       <td>
                         <a href="{{route('task.edit',$task_shows->id)}}" class="btn btn-info btn-sm">Edit</a>
@@ -170,9 +192,15 @@
                       </td>
                     </tr>
                     @empty
-                      <div class="div">
-                        <span>dff</span>
-                      </div>
+                    <tr>
+                      <td colspan="5">
+                        <div class="div">
+                          <span class="text-danger text-center">Task List Emty</span>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                     
                     @endforelse
                   </tbody>
               </table>
