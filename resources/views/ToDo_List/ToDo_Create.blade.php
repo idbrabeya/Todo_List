@@ -84,9 +84,14 @@
                         </td>
                       </tr>
                       @empty
-                        <div class="div">
-                          <span>dff</span>
-                        </div>
+                      <tr>
+                        <td colspan="5">
+                          <div class="div">
+                            <span class="text-danger text-center">ToDo List Emty</span>
+                          </div>
+                        </td>
+                      </tr>
+                        
                       @endforelse
                     </tbody>
                 </table>
@@ -178,16 +183,22 @@
                   </thead>
                   <tbody>
                     @forelse ($task_show as $key=>$task_shows)
+
                     <tr>
+                      <input type="hidden" class="button_delete" value="{{$task_shows->id}}">
                       <td>{{$key+1}}</td>
                       <td>{{$task_shows->todorelationtotask->name}}</td>
-                      <td>{{$task_shows->status}}</td>
+                      <td>
+                        {{$task_shows->status}}
+                      </td>
                       <td>{{$task_shows->prioriti}}</td>
                       <td>{{$task_shows->end_date}}</td>
                      
                       <td>
-                        <a href="{{route('task.edit',$task_shows->id)}}" class="btn btn-info btn-sm">Edit</a>
-                        <a href="{{route('task.delete',$task_shows->id)}}"  class="btn btn-danger btn-sm">Delete</a>
+                        <button class="btn btn-info btn-sm button_edit" value="{{$task_shows->id}}" type="button" data-bs-target="#myModaltask" data-bs-toggle="modal">Edit</button>
+
+                          <button type="submit"class="btn btn-danger btn-sm show_confirm">Delete</button>
+                    
                         <a href="{{route('task_view',$task_shows->id)}}" class="btn btn-warning btn-sm">View</a>
                       </td>
                     </tr>
@@ -208,6 +219,7 @@
         </div>
     </div>
   </div>
+
   <div class="row mt-4">
     <div class="col-md-12 ">
       <a href="{{route('todo.list.view')}}" class="btn btn-success">ToDo Project</a>
@@ -216,4 +228,131 @@
   </div>
 
 </div>
+
+{{-- modal edit task --}}
+{{-- id="editForm" action="{{ route('task.upda', $tetask_edit->id) }}" method="post" --}}
+<div class="modal fade" id="myModaltask" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="myModaltask">Edit Tasks</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm" action="" method="post">
+          @csrf
+          <div class="mb-3">
+            <label for="" class="form-label">Todo Name</label>
+           <select name="edit_todo_id" id="todo_name" class="form-control form-select">
+            <option value="">select</option>
+            @foreach (App\Models\TodoList::all() as $todo_name)
+            {{-- <option id="" value="{{$todo_name->id}}" @if($task_shows->todo_id==$todo_name->id) selected @endif>{{$todo_name->name}}</option> --}}
+            <option id="" value="{{$todo_name->id}}" @if(old('edit_todo_id',$task_shows->todo_id)==$todo_name->id) selected @endif>{{$todo_name->name}}</option>
+
+            @endforeach
+           </select>
+          </div>
+          <div class="mb-3">
+           <label for="" class="form-label ">Status</label>
+           <select name="status" id="status_name" class="form-control form-select">
+             <option value="select">Select</option>
+             <option value="completed" @if($task_shows->status=="completed") selected @endif>Completed</option>
+             <option value="progress" @if($task_shows->status=="progress") selected @endif>In Progress</option>
+             <option value="Not_Started" @if($task_shows->status=="Not_Started") selected @endif>Not Started</option>
+           </select>
+         </div>
+
+          <div class="mb-3">
+            <label for="" class="form-label ">Prioriti</label>
+            <select name="prioriti" id="prioriti_name" class="form-control form-select">
+             <option value="select" >Select</option>
+             <option value="high" @if ($task_shows->prioriti =='high') selected @endif>High</option>
+             <option value="medium" @if ($task_shows->prioriti =='medium') selected @endif>Medium</option>
+             <option value="low" @if ($task_shows->prioriti =='low') selected @endif>Low</option>
+           </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-submit">Update</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+@endsection
+
+@section('scripts')
+{{-- delete sweetalert --}}
+<script>
+ $(document).ready(function () {
+    $('.show_confirm').click(function(el){
+        el.preventDefault();
+        var buttonId = $(this).closest("tr").find('.button_delete').val();
+
+        Swal.fire({
+            title: 'Are you sure to delete this task?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+           
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    type: 'get',
+                    url: '/task/delete/' + buttonId,
+                    // data:{
+                    //          id: buttonId
+                    //        },
+                    success: function (response) {
+                        Swal.fire({
+                            title: response.status,
+                            icon: "success",
+                        }).then((result) => {
+                            location.reload();
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'An error occurred while deleting the item.',
+                            icon: 'error',
+                        });
+                    }
+                });
+            }
+        });
+    });
+});
+
+  // $('.show_confirm').click(function(event) {
+  //      var form =  $(this).closest("form");
+  //      var name = $(this).data("name");
+  //      event.preventDefault();
+  //      swal({
+  //          title: `Are you sure you want to delete this record?`,
+  //          text: "If you delete this, it will be gone forever.",
+  //          icon: "warning",
+  //          buttons: true,
+  //          dangerMode: true,
+  //      })
+  //      .then((willDelete) => {
+  //        if (willDelete) {
+  //          form.submit();
+  //        }
+  //      });
+  //  });
+</script>
+
+{{-- edit data --}}
+
 @endsection

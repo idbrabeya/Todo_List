@@ -99,7 +99,7 @@ class TodoListController extends Controller
     }
     public function task_edit($id){
         $task_edit = Task::findOrFail($id);
-        return view('ToDo_List.task_edit',compact('task_edit'));
+        return view('ToDo_List.todo.list',compact('task_edit'));
     }
 
     public function task_update(Request $request, $id){
@@ -115,13 +115,28 @@ class TodoListController extends Controller
         $task_delete= Task::findOrFail($id);
         // $task_delete=Task::where('todo_id',$todo_id)->delete();
         $task_delete->delete();
-        return back();
+        return response()->json(['status'=>'Task deleted successfully!']);
+        
     }
 
      public function task_view($id){
         $task_view = Task::findOrFail($id);
        return view('Todo_List.task_view',compact('task_view'));
      }
+//      public function status_change(Request $request){
+//         // dd($request->all());
+//        $taskId = $request->inpute('taskId');
+//        $status = $request->inpute('status');
+//        $updateStatus = Task::findOrFail($taskId);
+       
+//        if($updateStatus){
+//          $updateStatus->status= $status;
+//          $updateStatus->save();
+//          return response()->json(['message' => 'update']);
+//        }
+//        return response()->json(['error' => 'not update'], 404);
+
+// }
 
      public function todo_list_view(){
         $todo_list_view= Task::all();

@@ -62,4 +62,6 @@ Route::post('/task/update/{id}',[TodoListController::class,'task_update'])->name
 Route::get('/task/delete/{id}',[TodoListController::class,'task_delete'])->name('task.delete');
 Route::get('/task/view/{id}',[TodoListController::class,'task_view'])->name('task_view');
 Route::get('/todo/list/view',[TodoListController::class,'todo_list_view'])->name('todo.list.view');
+Route::POST('/status/change',[ToDoController::class,'status_change'])->name('status.change');
+
 
