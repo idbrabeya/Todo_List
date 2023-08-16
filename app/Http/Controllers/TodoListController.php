@@ -100,16 +100,18 @@ class TodoListController extends Controller
     public function task_edit($id){
         $task_edit = Task::findOrFail($id);
         return view('ToDo_List.todo.list',compact('task_edit'));
+        
     }
-
-    public function task_update(Request $request, $id){
+    
+    public function task_update(Request $request){
         // dd($request->all());
-        $task_update = Task::findOrFail($id);
+        $task_update = Task::findOrFail($request->id);
         $task_update->todo_id  = $request->todo_id;
-        $task_update->status  = $request->status ;
+        // $task_update->status  = $request->status ;
         $task_update->prioriti = $request->prioriti;
         $task_update->save();
-        return redirect()->route('todo.list');
+        return back();
+        // return redirect()->route('todo.list');
     }
     public function task_delete($id){
         $task_delete= Task::findOrFail($id);
@@ -123,20 +125,19 @@ class TodoListController extends Controller
         $task_view = Task::findOrFail($id);
        return view('Todo_List.task_view',compact('task_view'));
      }
-//      public function status_change(Request $request){
-//         // dd($request->all());
-//        $taskId = $request->inpute('taskId');
-//        $status = $request->inpute('status');
-//        $updateStatus = Task::findOrFail($taskId);
-       
-//        if($updateStatus){
-//          $updateStatus->status= $status;
-//          $updateStatus->save();
-//          return response()->json(['message' => 'update']);
-//        }
-//        return response()->json(['error' => 'not update'], 404);
-
-// }
+    
+     public function status_change(Request $request){
+        // dd($request->all());
+       $taskId = $request->task_id;
+       $status = $request->newStatus;
+       $updateStatus = Task::findOrFail($taskId);
+       if($updateStatus){
+         $updateStatus->status= $status;
+         $updateStatus->save();
+         return response()->json(['status' => 'update'],200);
+       }
+    
+}
 
      public function todo_list_view(){
         $todo_list_view= Task::all();

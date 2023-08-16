@@ -104,7 +104,7 @@
     {{-- task table --}}
 
     <div class="row mt-4">
-      <div class="col-md-5">
+      <div class="col-md-4">
           <div class="card">
               <div class="card-header bg-info justify-content-between d-flex">
                   <h4>Task CREATE</h4>
@@ -116,7 +116,7 @@
                     @csrf
                     <div class="mb-3">
                       <label for="" class="form-label">Todo Name</label>
-                     <select name="todo_id" id="" class="form-control form-select">
+                     <select name="todo_id" id="todo_select_id" class="form-control form-select">
                       <option value="" selected>select</option>
                       @foreach ($todo_show as $todo_shows)
                       <option value="{{$todo_shows->id}}">{{$todo_shows->name }}</option>
@@ -125,7 +125,7 @@
                     </div>
                     <div class="mb-3">
                      <label for="" class="form-label ">Status</label>
-                     <select name="status" id="" class="form-control form-select">
+                     <select name="status" id="status2" class="form-control form-select">
                        <option value="">Select</option>
                        <option value="completed">Completed</option>
                        <option value="progress">In Progress</option>
@@ -163,7 +163,7 @@
       </div>
       {{-- table --}}
 
-      <div class="col-md-7">
+      <div class="col-md-8">
         <div class="card">
             <div class="card-header bg-info justify-content-between d-flex">
                 <h4>Task List</h4>
@@ -189,17 +189,26 @@
                       <td>{{$key+1}}</td>
                       <td>{{$task_shows->todorelationtotask->name}}</td>
                       <td>
-                        {{$task_shows->status}}
+                       
+                       <select name="task_status" class="task_status form-select" value="" id="task_id" onchange="statusChange(this,{{$task_shows->id}})">
+                        <option value="">Select Please</option>
+                        <option @if($task_shows->status == 'completed') selected @endif value="completed">Completed</option>
+                          <option  @if($task_shows->status == 'progress') selected @endif value="progress">In Progress</option>
+                          <option  @if($task_shows->status == 'Not_Started') selected @endif value="Not_Started">Not Started</option>
+                      </select>
+                      
+                        {{-- {{$task_shows->status}} --}}
                       </td>
                       <td>{{$task_shows->prioriti}}</td>
                       <td>{{$task_shows->end_date}}</td>
                      
                       <td>
-                        <button class="btn btn-info btn-sm button_edit" value="{{$task_shows->id}}" type="button" data-bs-target="#myModaltask" data-bs-toggle="modal">Edit</button>
-
-                          <button type="submit"class="btn btn-danger btn-sm show_confirm">Delete</button>
-                    
-                        <a href="{{route('task_view',$task_shows->id)}}" class="btn btn-warning btn-sm">View</a>
+                        {{-- <button class="btn btn-info btn-sm button_edit" value="{{$task_shows->id}}" type="button" data-bs-target="#myModaltask" data-bs-toggle="modal">Edit</button> --}}
+                         
+                        <a class="btn btn-primary btn-sm" onclick="Task_edit('{{$task_shows->id}}','{{$task_shows->todo_id}}','{{$task_shows->prioriti}}')" type="button" id="" name="">Edit</a>
+                      
+                         <button type="submit"class="btn btn-danger btn-sm show_confirm">Delete</button>
+                        {{-- <a href="{{route('task_view',$task_shows->id)}}" class="btn btn-warning btn-sm">View</a> --}}
                       </td>
                     </tr>
                     @empty
@@ -210,8 +219,6 @@
                         </div>
                       </td>
                     </tr>
-                  
-                     
                     @endforelse
                   </tbody>
               </table>
@@ -232,7 +239,10 @@
 {{-- modal edit task --}}
 {{-- id="editForm" action="{{ route('task.upda', $tetask_edit->id) }}" method="post" --}}
 <div class="modal fade" id="myModaltask" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <form action="{{route('task.update')}}" method="post">
+    @csrf
   <div class="modal-dialog">
+    
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="myModaltask">Edit Tasks</h5>
@@ -241,47 +251,48 @@
         </button>
       </div>
       <div class="modal-body">
-        <form id="editForm" action="" method="post">
-          @csrf
+          <input type="hidden" id="id" name="id">
           <div class="mb-3">
             <label for="" class="form-label">Todo Name</label>
-           <select name="edit_todo_id" id="todo_name" class="form-control form-select">
+           <select name="todo_id" id="todo_id" class="form-control form-select">
             <option value="">select</option>
             @foreach (App\Models\TodoList::all() as $todo_name)
-            {{-- <option id="" value="{{$todo_name->id}}" @if($task_shows->todo_id==$todo_name->id) selected @endif>{{$todo_name->name}}</option> --}}
-            <option id="" value="{{$todo_name->id}}" @if(old('edit_todo_id',$task_shows->todo_id)==$todo_name->id) selected @endif>{{$todo_name->name}}</option>
+            <option id="" value="{{$todo_name->id}}" @if($task_shows->todo_id==$todo_name->id) selected @endif>{{$todo_name->name}}</option>
+            {{-- <option id="" value="{{$todo_name->id}}" @if(old('edit_todo_id',$task_shows->todo_id)==$todo_name->id) selected @endif>{{$todo_name->name}}</option> --}}
 
             @endforeach
            </select>
           </div>
-          <div class="mb-3">
+          {{-- <div class="mb-3">
            <label for="" class="form-label ">Status</label>
-           <select name="status" id="status_name" class="form-control form-select">
+           <select name="status" id="status" class="form-control form-select">
              <option value="select">Select</option>
              <option value="completed" @if($task_shows->status=="completed") selected @endif>Completed</option>
              <option value="progress" @if($task_shows->status=="progress") selected @endif>In Progress</option>
              <option value="Not_Started" @if($task_shows->status=="Not_Started") selected @endif>Not Started</option>
            </select>
-         </div>
+         </div> --}}
 
           <div class="mb-3">
             <label for="" class="form-label ">Prioriti</label>
-            <select name="prioriti" id="prioriti_name" class="form-control form-select">
+            <select name="prioriti" id="prioriti" class="form-control form-select">
              <option value="select" >Select</option>
              <option value="high" @if ($task_shows->prioriti =='high') selected @endif>High</option>
              <option value="medium" @if ($task_shows->prioriti =='medium') selected @endif>Medium</option>
              <option value="low" @if ($task_shows->prioriti =='low') selected @endif>Low</option>
            </select>
           </div>
-        </form>
+       
       </div>
       <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Update</button>
+
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary btn-submit">Update</button>
+        
       </div>
     </div>
   </div>
-
+</form>
 </div>
 @endsection
 
@@ -295,6 +306,8 @@
 
         Swal.fire({
             title: 'Are you sure to delete this task?',
+            width: 400,
+            height: 50,
             text: "You won't be able to revert this!",
             icon: 'warning',
             showCancelButton: true,
@@ -354,5 +367,51 @@
 </script>
 
 {{-- edit data --}}
+<script>
+  function Task_edit(id,todo_id,prioriti) {
+        
+      $('#id').val(id), 
+      $('#todo_id').val(todo_id), 
+      // $('#status').val(status), 
+      $('#prioriti').val(prioriti), 
+     $('#myModaltask').modal('show');
 
+  }
+</script>
+{{-- edit data end --}}
+
+{{-- todo select2 --}}
+<script>
+  $(document).ready(function() {
+    $('#todo_select_id').select2();
+  });
+</script>
+{{-- todo select2 end--}}
+
+{{-- status change start --}}
+<script>
+  function statusChange(el,id) {
+    var newStatus = el.value;
+      // alert(newStatus);
+      $.ajax({
+  headers: {
+             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+  type: 'get',
+  url: '{{route("status.change")}}',
+  data: {
+    task_id: id,
+    newStatus: newStatus
+  },
+  success: function (data){
+    // console.log(data.message);
+  },
+  error: function (error) {
+            // console.error("Error updating status:", error);
+    
+        }
+});
+  }
+</script>
+{{-- status change end --}}
 @endsection
