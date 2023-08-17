@@ -74,13 +74,15 @@
                     <tbody>
                       @forelse ($todo_show as $key=>$todo)
                       <tr>
+                        {{-- <input type="hidden" id="" value="{{$todo->id}}" class="todobutton_delete"> --}}
+
                         <td>{{$key+1}}</td>
                         <td>{{$todo->name}}</td>
                         <td>{{$todo->description}}</td>
                         <td>
                           <a href="{{route('todo.edit', $todo->id) }}" class="btn btn-info btn-sm">Edit</a>
                           <a href="{{route('todo_delete', $todo->id) }}"  class="btn btn-danger btn-sm">Delete</a>
-                          <a href="{{route('todo_view',$todo->id)}}" class="btn btn-warning btn-sm">View</a>
+                          {{-- <a type="button"  class="btn btn-danger btn-sm todo_delete">Delete</a> --}}
                         </td>
                       </tr>
                       @empty
@@ -227,12 +229,12 @@
     </div>
   </div>
 
-  <div class="row mt-4">
+  {{-- <div class="row mt-4">
     <div class="col-md-12 ">
       <a href="{{route('todo.list.view')}}" class="btn btn-success">ToDo Project</a>
 
     </div>
-  </div>
+  </div> --}}
 
 </div>
 
@@ -254,12 +256,13 @@
           <input type="hidden" id="id" name="id">
           <div class="mb-3">
             <label for="" class="form-label">Todo Name</label>
+            
            <select name="todo_id" id="todo_id" class="form-control form-select">
             <option value="">select</option>
             @foreach (App\Models\TodoList::all() as $todo_name)
-            <option id="" value="{{$todo_name->id}}" @if($task_shows->todo_id==$todo_name->id) selected @endif>{{$todo_name->name}}</option>
-            {{-- <option id="" value="{{$todo_name->id}}" @if(old('edit_todo_id',$task_shows->todo_id)==$todo_name->id) selected @endif>{{$todo_name->name}}</option> --}}
+            {{-- <option id="" value="{{$todo_name->id}}" @if($task_shows->todo_id==$todo_name->id) selected @endif>{{$todo_name->name}}</option> --}}
 
+            <option id="" value="{{$todo_name->id}}" >{{$todo_name->name}}</option>
             @endforeach
            </select>
           </div>
@@ -277,9 +280,9 @@
             <label for="" class="form-label ">Prioriti</label>
             <select name="prioriti" id="prioriti" class="form-control form-select">
              <option value="select" >Select</option>
-             <option value="high" @if ($task_shows->prioriti =='high') selected @endif>High</option>
-             <option value="medium" @if ($task_shows->prioriti =='medium') selected @endif>Medium</option>
-             <option value="low" @if ($task_shows->prioriti =='low') selected @endif>Low</option>
+             <option value="high"  >High</option>
+             <option value="medium" >Medium</option>
+             <option value="low" >Low</option>
            </select>
           </div>
        
@@ -297,7 +300,45 @@
 @endsection
 
 @section('scripts')
-{{-- delete sweetalert --}}
+{{-- todo delete sweetalert --}}
+<script>
+// $(document).ready(function () {
+//    $('.todo_delete').click(function (el) {
+//        el.preventDefault();  
+//        var todoDeleteId = $(this).closest("tr").find('.todobutton_delete').val();
+
+//        Swal.fire({
+//         icon: 'error',
+//          title: 'Oops...',
+//          text: 'Something went wrong!',
+  
+//        }).then((result) => {
+//            if (result.isConfirmed==true) {
+//                $.ajax({
+//                    headers: {
+//                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+//                    },
+//                    type: 'get',
+//                    url: '/todo/delete/' + todoDeleteId,
+//                    success: function (response) {
+                    
+//                       swal("delete successfully");
+//                    },
+//                    error: function (error) {
+//                        Swal.fire({
+//                            title: 'Delete',
+//                            text: 'An error occurred while deleting the item.',
+//                            icon: 'success',
+//                        });
+//                    }
+//                });
+//            }
+//        });
+//    });
+// });
+</script>
+{{-- todo delete sweetalert end --}}
+{{-- task delete sweetalert --}}
 <script>
  $(document).ready(function () {
     $('.show_confirm').click(function(el){
@@ -313,7 +354,6 @@
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-           
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
@@ -323,9 +363,6 @@
                     },
                     type: 'get',
                     url: '/task/delete/' + buttonId,
-                    // data:{
-                    //          id: buttonId
-                    //        },
                     success: function (response) {
                         Swal.fire({
                             title: response.status,
@@ -408,7 +445,6 @@
   },
   error: function (error) {
             // console.error("Error updating status:", error);
-    
         }
 });
   }

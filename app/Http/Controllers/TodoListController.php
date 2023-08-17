@@ -62,19 +62,18 @@ class TodoListController extends Controller
     }
 
     public function todo_delete($id){
-        
       $tast_id=Task::where('todo_id',$id)->first();
-      
         if($tast_id==null){
             TodoList::findOrFail($id)->delete();
         }else{
             // $tast_id->delete();
+            // return response()->json(['status','Please delete relatede item!!']);
             return back()->with('message','opps!this item not delete!');
         }
-       
+       return back();
         // $todo_delete=Task::where('todo_id',$todo_delete->id)->delete();
         // $todo_delete->delete();
-        return back();
+       
     }
 
     public function todo_view($id){
@@ -99,8 +98,8 @@ class TodoListController extends Controller
     }
     public function task_edit($id){
         $task_edit = Task::findOrFail($id);
-        return view('ToDo_List.todo.list',compact('task_edit'));
-        
+        // return view('ToDo_List.todo.list',compact('task_edit'));
+        return redirect()->route('todo.list',compact('task_edit'));
     }
     
     public function task_update(Request $request){
