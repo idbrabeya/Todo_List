@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->integer('todo_id');
             $table->boolean('user_id');
+            $table->string('user_name')->nullable();
+            $table->string('task_name')->nullable();
             $table->string('status');
             $table->string('prioriti')->nullable();
             $table->string('start_date')->nullable();

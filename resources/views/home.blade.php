@@ -63,7 +63,7 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header bg-info justify-content-between d-flex">
-                    <h4>CRUD TEST</h4>
+                    <h4>Todo App</h4>
                     <a type="button" href="{{route('info.data.show')}}" class="btn btn-warning">All Members</a>
                 </div>
 
@@ -98,7 +98,8 @@
                       </div>
                     <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#dataAddModal">Add_Info</a>
                   </form> --}}
-                  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#dataAddModal">Add_Info</button>
+                  {{-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#dataAddModal">Add_Info</button> --}}
+                  <a href="{{route('todo.list')}}" type="submit" class="btn btn-primary" >ToDo Create</a>
 
                 </div>
             </div>

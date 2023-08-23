@@ -11,11 +11,11 @@
                 </div>
 
                 <div class="card-body">
-                  <form method="post" action="{{route('todolist.insert')}}" enctype="multipart/form-data">
+                  <form method="post" action="{{route('todolist.insert')}}" enctype="multipart/form-data" id="todo_create">
                     @csrf
                     <div class="mb-3">
                       <label for="" class="form-label">Title</label>
-                      <input type="text" class="form-control" name="name" >
+                      <input type="text" class="form-control" name="name" id="todo_name">
                     </div>
 
                     @if($errors->has('name'))
@@ -26,27 +26,9 @@
 
                     <div class="mb-3">
                       <label for="" class="form-label">Description</label>
-                      <textarea name="description" id="" cols="40" class="form-control"></textarea>
+                      <textarea name="description" id="todo_des" cols="40" class="form-control"></textarea>
                     </div>
-                    {{-- <div class="mb-3">
-                        <label for="" class="form-label">Marital Status</label>
-                        <select name="marital_status" class="form-select" value="">
-                        <option value="" selected>Select Status</option>
-                        <option value="Single">Single</option>
-                        <option value="Married">Married</option>
-                        <option value="Divorce">Divorce</option>
-                    </select>
-                      </div> --}}
-                    {{-- <div class="mb-3">
-                        <label for="" class="form-label">phone</label>
-                        <input type="number" class="form-control" name="phone" placeholder="phone number">
-                      </div> --}}
-                     
-                      {{-- <div class="mb-3">
-                        <label for="" class="form-label">Image</label>
-                        <input type="file" class="form-control" name="image" accept="image/*">
-                      </div> --}}
-                      <button type="submit" class="btn btn-primary">Add_ToDo</button>
+                      <button type="submit" class="btn btn-primary" id="add_todo">Add_ToDo</button>
                   </form>
                   
 
@@ -60,7 +42,6 @@
               <div class="card-header bg-info justify-content-between d-flex">
                   <h4>TODO LIST</h4>
               </div>
-
               <div class="card-body">
                   <table class="table table-bordered">
                     <thead>
@@ -74,15 +55,17 @@
                     <tbody>
                       @forelse ($todo_show as $key=>$todo)
                       <tr>
-                        {{-- <input type="hidden" id="" value="{{$todo->id}}" class="todobutton_delete"> --}}
+                        <input type="hidden" id="" value="{{$todo->id}}" class="todobutton_delete">
 
-                        <td>{{$key+1}}</td>
+                        <td>{{ ($key+1) + ($todo_show->currentPage() - 1)*$todo_show->perPage() }}</td>
                         <td>{{$todo->name}}</td>
                         <td>{{$todo->description}}</td>
                         <td>
-                          <a href="{{route('todo.edit', $todo->id) }}" class="btn btn-info btn-sm">Edit</a>
-                          <a href="{{route('todo_delete', $todo->id) }}"  class="btn btn-danger btn-sm">Delete</a>
-                          {{-- <a type="button"  class="btn btn-danger btn-sm todo_delete">Delete</a> --}}
+                          <a type="button" onclick="edit_todo('{{ $todo->id }}','{{ $todo->name}}','{{ $todo->description}}')" class="btn btn-primary btn-sm">Edit</a>
+
+                          {{-- <a href="{{route('todo_delete', $todo->id) }}"  class="btn btn-danger btn-sm">Delete</a> --}}
+                          <button type="submit"class="btn btn-danger btn-sm todo_delete">Delete</button>
+
                         </td>
                       </tr>
                       @empty
@@ -97,6 +80,7 @@
                       @endforelse
                     </tbody>
                 </table>
+                {{$todo_show->appends(['task_show'=>$task_show->currentPage()])->links()}}
               </div>
           </div>
       </div>
@@ -106,44 +90,74 @@
     {{-- task table --}}
 
     <div class="row mt-4">
-      <div class="col-md-4">
+      <div class="col-md-10 mx-auto">
           <div class="card">
               <div class="card-header bg-info justify-content-between d-flex">
-                  <h4>Task CREATE</h4>
-                  {{-- <a type="button" href="{{route('all.member')}}" class="btn btn-warning">ToDo</a> --}}
+                  <h4>TASK CREATE</h4>
+              
               </div>
 
               <div class="card-body">
                 <form action="{{route('task.list.insert')}}" method="post">
                     @csrf
+
                     <div class="mb-3">
-                      <label for="" class="form-label">Todo Name</label>
-                     <select name="todo_id" id="todo_select_id" class="form-control form-select">
-                      <option value="" selected>select</option>
-                      @foreach ($todo_show as $todo_shows)
-                      <option value="{{$todo_shows->id}}">{{$todo_shows->name }}</option>
-                      @endforeach
-                     </select>
+                      <label for="" class="form-label ">Task Name</label>
+                      <input type="text" name="task_name" class="form-control" id="">
                     </div>
-                    <div class="mb-3">
-                     <label for="" class="form-label ">Status</label>
-                     <select name="status" id="status2" class="form-control form-select">
-                       <option value="">Select</option>
-                       <option value="completed">Completed</option>
-                       <option value="progress">In Progress</option>
-                       <option value="Not_Started">Not Started</option>
-                      
-                     </select>
-                   </div>
-                    <div class="mb-3">
-                      <label for="" class="form-label ">Prioriti</label>
-                      <select name="prioriti" id="" class="form-control form-select">
-                       <option value="select">Select</option>
-                       <option value="high">High</option>
-                       <option value="medium">Medium</option>
-                       <option value="low">Low</option>
-                     </select>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="mb-3">
+                          <label for="" class="form-label">Todo Name</label>
+                         <select name="todo_id" id="todo_select_id" class="form-control form-select">
+                          <option value="" selected>select</option>
+                          @foreach ($todo_show as $todo_shows)
+                          <option value="{{$todo_shows->id}}">{{$todo_shows->name }}</option>
+                          @endforeach
+                         </select>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="mb-3">
+                          <label for="" class="form-label ">User</label>
+                          <select name="user_name" id="" class="form-control form-select">
+                            <option value="">Select</option>
+                           @foreach (App\Models\User:: all() as $user_name)
+                           <option value="{{$user_name->name}}">{{$user_name->name}}</option>
+                           @endforeach
+                          </select>
+                        </div>
+                      </div>
                     </div>
+                  
+                    
+                     <div class="row">
+                      <div class="col-md-6">
+                        <div class="mb-3">
+                          <label for="" class="form-label ">Status</label>
+                          <select name="status" id="status2" class="form-control form-select">
+                            <option value="">Select</option>
+                            <option value="completed">Completed</option>
+                            <option value="progress">In Progress</option>
+                            <option value="Not_Started">Not Started</option>
+                           
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+
+                        <div class="mb-3">
+                          <label for="" class="form-label ">Prioriti</label>
+                          <select name="prioriti" id="" class="form-control form-select">
+                           <option value="select">Select</option>
+                           <option value="high">High</option>
+                           <option value="medium">Medium</option>
+                           <option value="low">Low</option>
+                         </select>
+                        </div>
+                      </div>
+                     </div>
+                  
                       <div class="row">
                         <div class="col-6">
                           <div class="mb-3">
@@ -164,11 +178,12 @@
           </div>
       </div>
       {{-- table --}}
-
-      <div class="col-md-8">
+    </div>
+       <div class="row mt-4">
+      <div class="col-md-12">
         <div class="card">
             <div class="card-header bg-info justify-content-between d-flex">
-                <h4>Task List</h4>
+                <h4>TASK LIST</h4>
             </div>
 
             <div class="card-body">
@@ -176,10 +191,12 @@
                   <thead>
                     <tr>
                       <th >ID</th>
+                      <th >User Name</th>
                       <th >Todo Name</th>
                       <th >Status</th>
                       <th >Prioriti</th>
-                      <th >Target Date</th>
+                      <th >Start Date</th>
+                      <th >End Date</th>
                       <th >Action</th>
                     </tr>
                   </thead>
@@ -188,7 +205,8 @@
 
                     <tr>
                       <input type="hidden" class="button_delete" value="{{$task_shows->id}}">
-                      <td>{{$key+1}}</td>
+                      <td>{{($key+1) + ($task_show->currentPage() - 1) * $task_show->perPage()}}</td>
+                      <td>{{$task_shows->userrelationtotask->name}}</td>
                       <td>{{$task_shows->todorelationtotask->name}}</td>
                       <td>
                        
@@ -202,14 +220,15 @@
                         {{-- {{$task_shows->status}} --}}
                       </td>
                       <td>{{$task_shows->prioriti}}</td>
+                      <td>{{$task_shows->start_date}}</td>
                       <td>{{$task_shows->end_date}}</td>
                      
                       <td>
                         {{-- <button class="btn btn-info btn-sm button_edit" value="{{$task_shows->id}}" type="button" data-bs-target="#myModaltask" data-bs-toggle="modal">Edit</button> --}}
                          
-                        <a class="btn btn-primary btn-sm" onclick="Task_edit('{{$task_shows->id}}','{{$task_shows->todo_id}}','{{$task_shows->prioriti}}')" type="button" id="" name="">Edit</a>
+                        <a class="btn btn-primary btn-sm" onclick="Task_edit('{{$task_shows->id}}','{{$task_shows->todo_id}}','{{$task_shows->prioriti}}')" type="button" id="" name=""><i class="fa-solid fa-pen-to-square"></i></a>
                       
-                         <button type="submit"class="btn btn-danger btn-sm show_confirm">Delete</button>
+                         <button type="submit"class="btn btn-danger btn-sm show_confirm"><i class="fa-solid fa-trash"></i></button>
                         {{-- <a href="{{route('task_view',$task_shows->id)}}" class="btn btn-warning btn-sm">View</a> --}}
                       </td>
                     </tr>
@@ -224,27 +243,20 @@
                     @endforelse
                   </tbody>
               </table>
+              {{$task_show->appends(['todo_show'=>$todo_show->currentPage()])->links()}}
             </div>
         </div>
     </div>
   </div>
-
-  {{-- <div class="row mt-4">
-    <div class="col-md-12 ">
-      <a href="{{route('todo.list.view')}}" class="btn btn-success">ToDo Project</a>
-
-    </div>
-  </div> --}}
-
 </div>
-
+{{-- modal todo edit --}}
+@include('ToDo_List.modal.todo_editmodal');
 {{-- modal edit task --}}
 {{-- id="editForm" action="{{ route('task.upda', $tetask_edit->id) }}" method="post" --}}
 <div class="modal fade" id="myModaltask" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <form action="{{route('task.update')}}" method="post">
     @csrf
   <div class="modal-dialog">
-    
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="myModaltask">Edit Tasks</h5>
@@ -289,7 +301,6 @@
       </div>
       <div class="modal-footer">
         <button type="submit" class="btn btn-primary">Update</button>
-
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         
       </div>
@@ -300,42 +311,97 @@
 @endsection
 
 @section('scripts')
+{{-- todo add using ajax --}}
+<script>
+  $(document).ready(function () {
+    $('#add_todo').click(function(){
+      
+      var todoName = $('#todo_name').val();
+      var todoDes = $('#todo_des').val();
+      $.ajax({
+        headers: {
+                       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                   },
+
+        type: 'post',
+        url: '{{route("todolist.insert")}}',
+        data: {
+         
+          todoName: todoName,
+          todoDes: todoDes,
+        },
+       
+        success: function (response) {
+          if (response==1) { 
+            Swal.fire('New Project Successfully Addedd');
+          }
+        }
+      });
+    })
+  });
+</script>
+
+
+{{-- todo edit using modal --}}
+<script>
+  
+  function edit_todo(id , title, description){
+      $('#ids').val(id),
+      $('#name').val(title),
+      $('#description').val(description),
+   $('#todomodal').modal('show');
+   $('#todomodal').modal({
+      keyboard: false,
+      backdrop: 'static',
+     
+  });
+  }
+</script>
+
 {{-- todo delete sweetalert --}}
 <script>
-// $(document).ready(function () {
-//    $('.todo_delete').click(function (el) {
-//        el.preventDefault();  
-//        var todoDeleteId = $(this).closest("tr").find('.todobutton_delete').val();
-
-//        Swal.fire({
-//         icon: 'error',
-//          title: 'Oops...',
-//          text: 'Something went wrong!',
+$(document).ready(function () {
+   $('.todo_delete').click(function (el) {
+       el.preventDefault();  
+       var todoDeleteId = $(this).closest("tr").find('.todobutton_delete').val();   
+       Swal.fire({
+        title: 'Are you sure to delete this item?',
+            width: 400,
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
   
-//        }).then((result) => {
-//            if (result.isConfirmed==true) {
-//                $.ajax({
-//                    headers: {
-//                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-//                    },
-//                    type: 'get',
-//                    url: '/todo/delete/' + todoDeleteId,
-//                    success: function (response) {
-                    
-//                       swal("delete successfully");
-//                    },
-//                    error: function (error) {
-//                        Swal.fire({
-//                            title: 'Delete',
-//                            text: 'An error occurred while deleting the item.',
-//                            icon: 'success',
-//                        });
-//                    }
-//                });
-//            }
-//        });
-//    });
-// });
+       }).then((result) => {
+           if (result.isConfirmed) {
+               $.ajax({
+                   headers: {
+                       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                   },
+                   type: 'get',
+                   url: '/todo/delete/' + todoDeleteId,
+                  
+                   success: function (response) {
+                      // Swal.fire(response.status==200)
+                      if(response.status==200){
+                        Swal.fire('Deleted!', 'The todo has been deleted.', 'success').then (function(){
+                          location.reload();
+                        });
+                        
+                      }else if(response.status==403){
+                        Swal.fire('Error!', 'Oops! This item cannot be deleted because it has associated tasks.', 'error');
+
+                      }
+                     
+                   },
+                  
+               });
+           }
+       });
+   });
+});
 </script>
 {{-- todo delete sweetalert end --}}
 {{-- task delete sweetalert --}}
@@ -420,16 +486,54 @@
 {{-- todo select2 --}}
 <script>
   $(document).ready(function() {
-    $('#todo_select_id').select2();
+    $('#todo_select_id').select2({
+      sorter: data => data.sort((a, b) => a.text.localeCompare(b.text)),
+    });
   });
 </script>
 {{-- todo select2 end--}}
 
 {{-- status change start --}}
 <script>
+  function statusChange(el, id) {
+    var newStatus = el.value;
+    Swal.fire({
+        title: 'Are you sure to change status?',
+        icon: 'warning',
+        width: 300,
+        height: 300,
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+
+            $.ajax({
+              headers: {
+             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+                url: '{{route("status.change")}}',
+                type: 'get',
+                data: { task_id: id, newStatus: newStatus},
+                success: function (response) {
+                    Swal.fire({title: response.status,
+                            icon: "success", width: 300,}).then(function () {
+                        table.ajax.reload(null, false);
+                    });
+                },
+                error: function () {
+                    Swal.fire('Oops...', "Something went wrong with AJAX!", "error");
+                }
+            });
+        }
+    })
+}
+</script>
+{{-- <script>
   function statusChange(el,id) {
     var newStatus = el.value;
-      // alert(newStatus);
+  
       $.ajax({
   headers: {
              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -441,13 +545,13 @@
     newStatus: newStatus
   },
   success: function (data){
-    // console.log(data.message);
+    console.log(data.message);
   },
   error: function (error) {
-            // console.error("Error updating status:", error);
+            console.error("Error updating status:", error);
         }
 });
   }
-</script>
+</script> --}}
 {{-- status change end --}}
 @endsection

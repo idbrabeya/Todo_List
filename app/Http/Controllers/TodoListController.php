@@ -13,31 +13,35 @@ class TodoListController extends Controller
         $this->middleware('auth');
     }
     public function todo_list_create(){
-        $todo_show=TodoList::all();
+    //    todo list
         if (auth()->user()->is_admin==1) {
-            $task_show=Task::all();
+            $todo_show=TodoList::paginate(5,['*'],'todo_show');
+            
         }  else{
-            $task_show=Task::where('user_id',Auth()->user()->id)->get();
+            $todo_show=TodoList::where('user_id',Auth()->user()->id)->paginate(5,['*'],'todo_show');
         }
-        
-
+// task list
+        if (auth()->user()->is_admin==1) {
+            $task_show=Task::paginate(5,['*'],'task_show');
+        }  else{
+            $task_show=Task::where('user_id',Auth()->user()->id)->paginate(5,['*'],'task_show');
+        }
         return view('ToDo_List.ToDo_Create',compact('todo_show','task_show'));
     }
     
     public function todolist_insert(Request $request){
-
+        $user_id=auth()->user()->id;
         $request->validate([
                  'name'=>'required|unique:todo_lists',
         ]);
 
        $Todoinsert=new TodoList;
+       $Todoinsert->user_id  = $user_id;
        $Todoinsert->name =$request->name;
        $Todoinsert->description =$request->description;
-       $Todoinsert->email =$request->email;
-       $Todoinsert->marital_status=$request->marital_status;
-       $Todoinsert->phone =$request->phone;
        $Todoinsert->save();
        return back();
+
     }
    
     // public function all_member(){
@@ -52,27 +56,33 @@ class TodoListController extends Controller
         $todo_edit = TodoList::findOrFail($id);
         return view('ToDo_List.todo_edit',compact('todo_edit'));
     }
-    public function todo_update(Request $request,$id){
-        $todo_update=ToDoList::findOrFail($id);
-        $todo_update->name=$request->name;
-        $todo_update->description =$request->description ;
-        $todo_update->save();
-        return redirect()->route('todo.list');
-
+    public function todo_update(Request $request){
+     $request->validate([
+            'title'=>'required|unique:todo_lists,name,'.$request->id,
+   ]);
+   
+    $todo_update=ToDoList::findOrFail($request->id);
+    $todo_update->name=$request->title;
+    $todo_update->description =$request->description ;
+    $todo_update->save();
+    return back();
     }
 
     public function todo_delete($id){
-      $tast_id=Task::where('todo_id',$id)->first();
-        if($tast_id==null){
+      $task_id=Task::where('todo_id',$id)->first();
+        if($task_id==null){
             TodoList::findOrFail($id)->delete();
+            return response()->json(['status' => 200, 'message' => 'Deleted successfully!']);
+
         }else{
             // $tast_id->delete();
-            // return response()->json(['status','Please delete relatede item!!']);
-            return back()->with('message','opps!this item not delete!');
+            // $todo_delete=Task::where('todo_id', $task_id->id)->delete();
+            // $todo_delete->delete();
+            // return back()->with('message','opps!this item not delete!');
+            return response()->json(['status' => 403, 'message' => 'Oops! This item cannot be deleted because it has associated tasks.']);
         }
-       return back();
-        // $todo_delete=Task::where('todo_id',$todo_delete->id)->delete();
-        // $todo_delete->delete();
+    //    return back();
+       
        
     }
 
@@ -87,6 +97,8 @@ class TodoListController extends Controller
         $task_insert = new Task;
         $task_insert->todo_id  = $request->todo_id;
         $task_insert->user_id  = $user_id;
+        $task_insert->user_name  = $request->user_name;
+        $task_insert->task_name  = $request->task_name;
         $task_insert->status  = $request->status ;
         $task_insert->prioriti = $request->prioriti;
         $task_insert->start_date = $request->start_date;
@@ -103,12 +115,15 @@ class TodoListController extends Controller
     }
     
     public function task_update(Request $request){
+        $request->validate([
+            'title'=>'required|unique:todo_lists,name,'.$request->id,
+   ]);
         // dd($request->all());
         $task_update = Task::findOrFail($request->id);
         $task_update->todo_id  = $request->todo_id;
         // $task_update->status  = $request->status ;
         $task_update->prioriti = $request->prioriti;
-        $task_update->save();
+        $task_update->update();
         return back();
         // return redirect()->route('todo.list');
     }
@@ -133,7 +148,7 @@ class TodoListController extends Controller
        if($updateStatus){
          $updateStatus->status= $status;
          $updateStatus->save();
-         return response()->json(['status' => 'update'],200);
+         return response()->json(['status' => 'status changed successfully!'],200);
        }
     
 }

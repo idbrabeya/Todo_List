@@ -141,5 +141,9 @@ class HomeController extends Controller
         return view('user',compact('product'));
      
 }
+public function all_user(){
+   $user_names= User::paginate(5);
+    return view('user.index',compact('user_names'));
+}
 
 }
