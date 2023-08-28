@@ -5,6 +5,7 @@ use App\Models\TodoList;
 use App\Models\Task;
 use Illuminate\Auth\Events\validated;
 use Illuminate\Http\Request;
+Use \Carbon\Carbon;
 
 class TodoListController extends Controller
 {
@@ -15,10 +16,10 @@ class TodoListController extends Controller
     public function todo_list_create(){
     //    todo list
         if (auth()->user()->is_admin==1) {
-            $todo_show=TodoList::paginate(5,['*'],'todo_show');
+            $todo_show=TodoList::paginate(10,['*'],'todo_show');
             
         }  else{
-            $todo_show=TodoList::where('user_id',Auth()->user()->id)->paginate(5,['*'],'todo_show');
+            $todo_show=TodoList::where('user_id',Auth()->user()->id)->paginate(10,['*'],'todo_show');
         }
 // task list
         if (auth()->user()->is_admin==1) {
@@ -40,7 +41,8 @@ class TodoListController extends Controller
        $Todoinsert->name =$request->name;
        $Todoinsert->description =$request->description;
        $Todoinsert->save();
-       return back();
+       return back()->with('success', 'Todo item added successfully!');
+
 
     }
    
@@ -53,19 +55,23 @@ class TodoListController extends Controller
      return view('ToDo_List.member_edit',compact('member_edit'));
     }
     public function todo_edit($id){
-        $todo_edit = TodoList::findOrFail($id);
-        return view('ToDo_List.todo_edit',compact('todo_edit'));
+       $todo_edit = TodoList::findOrFail($id);
+        return response()->json( $todo_edit);
+       
     }
     public function todo_update(Request $request){
-     $request->validate([
-            'title'=>'required|unique:todo_lists,name,'.$request->id,
-   ]);
-   
+        $request->validate([
+            'name' => 'required|unique:todo_lists,name,' . $request->id,
+           
+        ]);
+
     $todo_update=ToDoList::findOrFail($request->id);
-    $todo_update->name=$request->title;
+    $todo_update->name=$request->name;
     $todo_update->description =$request->description ;
     $todo_update->save();
-    return back();
+    // return back();
+    return response()->json(['status' => 'ToDoList item updated successfully']);
+
     }
 
     public function todo_delete($id){
@@ -94,13 +100,16 @@ class TodoListController extends Controller
     public function task_list_insert(Request $request){
         $user_id=auth()->user()->id;
       
+        $user_names = implode(',', $request->user_name);
+
         $task_insert = new Task;
         $task_insert->todo_id  = $request->todo_id;
         $task_insert->user_id  = $user_id;
-        $task_insert->user_name  = $request->user_name;
+        $task_insert->user_name  = $user_names;
         $task_insert->task_name  = $request->task_name;
         $task_insert->status  = $request->status ;
         $task_insert->prioriti = $request->prioriti;
+        $task_insert->current_dates	 = Carbon::now()->format('d-m-Y');
         $task_insert->start_date = $request->start_date;
         $task_insert->end_date = $request->end_date;
         $task_insert->save();
@@ -110,22 +119,23 @@ class TodoListController extends Controller
     }
     public function task_edit($id){
         $task_edit = Task::findOrFail($id);
+        return response()->json($task_edit);
         // return view('ToDo_List.todo.list',compact('task_edit'));
-        return redirect()->route('todo.list',compact('task_edit'));
+        // return redirect()->route('todo.list',compact('task_edit'));
     }
     
     public function task_update(Request $request){
-        $request->validate([
-            'title'=>'required|unique:todo_lists,name,'.$request->id,
-   ]);
+        $user_names = implode(',', $request->user_name);
+
         // dd($request->all());
         $task_update = Task::findOrFail($request->id);
-        $task_update->todo_id  = $request->todo_id;
-        // $task_update->status  = $request->status ;
+        $task_update->todo_id = $request->todo_id;
+        $task_update->task_name = $request->task_name;
+        $task_update->user_name = $user_names;
         $task_update->prioriti = $request->prioriti;
         $task_update->update();
-        return back();
-        // return redirect()->route('todo.list');
+        // return back();
+        return response()->json(['success'=>true]);
     }
     public function task_delete($id){
         $task_delete= Task::findOrFail($id);
@@ -147,6 +157,11 @@ class TodoListController extends Controller
        $updateStatus = Task::findOrFail($taskId);
        if($updateStatus){
          $updateStatus->status= $status;
+         if($status==='completed'){
+            $updateStatus->current_dates=Carbon::now()->format('d-M-Y');
+         }else{
+            $updateStatus->current_dates=null;
+         }
          $updateStatus->save();
          return response()->json(['status' => 'status changed successfully!'],200);
        }

@@ -20,7 +20,7 @@
 
                     @if($errors->has('name'))
                    <span class="text-danger">
-                  {{$errors->first('name')}}
+                     {{$errors->first('name')}}
                    </span>
                     @endif
 
@@ -103,31 +103,51 @@
 
                     <div class="mb-3">
                       <label for="" class="form-label ">Task Name</label>
-                      <input type="text" name="task_name" class="form-control" id="">
+                      <input type="text" name="task_name" class="form-control" id="" required>
                     </div>
                     <div class="row">
-                      <div class="col-md-6">
-                        <div class="mb-3">
-                          <label for="" class="form-label">Todo Name</label>
-                         <select name="todo_id" id="todo_select_id" class="form-control form-select">
-                          <option value="" selected>select</option>
-                          @foreach ($todo_show as $todo_shows)
-                          <option value="{{$todo_shows->id}}">{{$todo_shows->name }}</option>
-                          @endforeach
-                         </select>
+                      @if(auth()->user()->is_admin!=1)
+                        <div class="col-md-12">
+                          <div class="mb-3">
+                            <label for="" class="form-label">Todo Name</label>
+                           <select name="todo_id" id="todo_select_id" class="form-control form-select">
+                            <option value="" selected>select</option>
+                            @foreach ($todo_show as $todo_shows)
+                            <option value="{{$todo_shows->id}}">{{$todo_shows->name }}</option>
+                            @endforeach
+                           </select>
+                          </div>
                         </div>
-                      </div>
-                      <div class="col-md-6">
-                        <div class="mb-3">
-                          <label for="" class="form-label ">User</label>
-                          <select name="user_name" id="" class="form-control form-select">
-                            <option value="">Select</option>
-                           @foreach (App\Models\User:: all() as $user_name)
-                           <option value="{{$user_name->name}}">{{$user_name->name}}</option>
-                           @endforeach
-                          </select>
+                      @else
+                        <div class="col-md-6">
+                          <div class="mb-3">
+                            <label for="" class="form-label">Todo Name</label>
+                           <select name="todo_id" id="todo_select_id" class="form-control form-select">
+                            <option value="" selected>select</option>
+                            @foreach ($todo_show as $todo_shows)
+                            <option value="{{$todo_shows->id}}">{{$todo_shows->name }}</option>
+                            @endforeach
+                           </select>
+                          </div>
                         </div>
-                      </div>
+                     
+                     
+
+                      @endif
+                      @if(auth()->user()->is_admin==1)
+                        <div class="col-md-6">
+                          <div class="mb-3">
+                            <label for="" class="form-label ">Assigned To</label>
+                            <select name="user_name[]" id="assigned_select_id" class="form-control form-select assigned_select">
+                              <option value="">Please Select</option>
+                             @foreach (App\Models\User:: all() as $user_name)
+                             <option value="{{$user_name->name}}">{{$user_name->name}}</option>
+                             @endforeach
+                            </select>
+                          </div>
+                        </div>
+                      
+                 @endif
                     </div>
                   
                     
@@ -187,14 +207,20 @@
             </div>
 
             <div class="card-body">
-                <table class="table table-bordered">
+                <table class="table table-bordered" style="width:100%">
                   <thead>
                     <tr>
                       <th >ID</th>
-                      <th >User Name</th>
+                      <th >Task Creator</th>
                       <th >Todo Name</th>
+                      <th >Task Name</th>
                       <th >Status</th>
                       <th >Prioriti</th>
+                      @if (auth()->user()->is_admin==1)
+                      <th >Assigned To</th>
+                    @endif
+                     
+                      <th >Current Date</th>
                       <th >Start Date</th>
                       <th >End Date</th>
                       <th >Action</th>
@@ -208,6 +234,7 @@
                       <td>{{($key+1) + ($task_show->currentPage() - 1) * $task_show->perPage()}}</td>
                       <td>{{$task_shows->userrelationtotask->name}}</td>
                       <td>{{$task_shows->todorelationtotask->name}}</td>
+                      <td>{{$task_shows->task_name}}</td>
                       <td>
                        
                        <select name="task_status" class="task_status form-select" value="" id="task_id" onchange="statusChange(this,{{$task_shows->id}})">
@@ -220,13 +247,20 @@
                         {{-- {{$task_shows->status}} --}}
                       </td>
                       <td>{{$task_shows->prioriti}}</td>
+                         @if (auth()->user()->is_admin==1)
+                           <td>{{$task_shows->user_name}}</td>
+                           
+                         @endif
+                     
+
+                      <td>{{$task_shows->current_dates}}</td>
                       <td>{{$task_shows->start_date}}</td>
                       <td>{{$task_shows->end_date}}</td>
                      
                       <td>
                         {{-- <button class="btn btn-info btn-sm button_edit" value="{{$task_shows->id}}" type="button" data-bs-target="#myModaltask" data-bs-toggle="modal">Edit</button> --}}
                          
-                        <a class="btn btn-primary btn-sm" onclick="Task_edit('{{$task_shows->id}}','{{$task_shows->todo_id}}','{{$task_shows->prioriti}}')" type="button" id="" name=""><i class="fa-solid fa-pen-to-square"></i></a>
+                        <a class="btn btn-primary btn-sm" onclick="Task_edit('{{$task_shows->id}}','{{$task_shows->todo_id}}','{{$task_shows->prioriti}}','{{$task_shows->task_name}}','{{$task_shows->user_name}}')" type="button" id="" name=""><i class="fa-solid fa-pen-to-square"></i></a>
                       
                          <button type="submit"class="btn btn-danger btn-sm show_confirm"><i class="fa-solid fa-trash"></i></button>
                         {{-- <a href="{{route('task_view',$task_shows->id)}}" class="btn btn-warning btn-sm">View</a> --}}
@@ -265,10 +299,9 @@
         </button>
       </div>
       <div class="modal-body">
-          <input type="hidden" id="id" name="id">
+          <input type="text" id="id" name="id">
           <div class="mb-3">
             <label for="" class="form-label">Todo Name</label>
-            
            <select name="todo_id" id="todo_id" class="form-control form-select">
             <option value="">select</option>
             @foreach (App\Models\TodoList::all() as $todo_name)
@@ -277,6 +310,23 @@
             <option id="" value="{{$todo_name->id}}" >{{$todo_name->name}}</option>
             @endforeach
            </select>
+          </div>
+          @if (auth()->user()->is_admin==1)
+          <div class="mb-3">
+            <label for="" class="form-label ">Assigned To</label>
+            <select name="user_name[]" id="user_name"  class="form-control bg-light test" multiple="multiple" style="width: 100%;">
+              <option value="select">Please Select</option>
+             @foreach (App\Models\User:: all() as $user_name)
+             <option id="" value="{{$user_name->name}}">{{$user_name->name}}</option>
+             @endforeach
+            </select>
+          </div>  
+        @endif
+          
+
+          <div class="mb-3">
+            <label for="" class="form-label ">Task Name</label>
+            <input type="text" name="task_name" class="form-control" id="task_name">
           </div>
           {{-- <div class="mb-3">
            <label for="" class="form-label ">Status</label>
@@ -287,7 +337,7 @@
              <option value="Not_Started" @if($task_shows->status=="Not_Started") selected @endif>Not Started</option>
            </select>
          </div> --}}
-
+         @if (auth()->user()->is_admin==1)
           <div class="mb-3">
             <label for="" class="form-label ">Prioriti</label>
             <select name="prioriti" id="prioriti" class="form-control form-select">
@@ -297,10 +347,10 @@
              <option value="low" >Low</option>
            </select>
           </div>
-       
+       @endif
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Update</button>
+        <button type="button" class="btn btn-primary" onclick="task_updates()">Update</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         
       </div>
@@ -315,7 +365,6 @@
 <script>
   $(document).ready(function () {
     $('#add_todo').click(function(){
-      
       var todoName = $('#todo_name').val();
       var todoDes = $('#todo_des').val();
       $.ajax({
@@ -345,17 +394,63 @@
 {{-- todo edit using modal --}}
 <script>
   
-  function edit_todo(id , title, description){
-      $('#ids').val(id),
-      $('#name').val(title),
-      $('#description').val(description),
+  function edit_todo(id,name,description){
+    var id= id;
+    $.ajax({
+      type: 'get',
+      url: '/todo/edit/'+ id,
+      success: function (response) {
+        // console.log(response);
+        $('#ids').val(response.id),
+      $('#name').val(response.name),
+      $('#description').val(response.description),
    $('#todomodal').modal('show');
    $('#todomodal').modal({
       keyboard: false,
       backdrop: 'static',
-     
   });
+
+      },error:function(error){
+        console.log(error);
+      }
+    });  
   }
+   
+  function todo_update(){
+    var id =$('#ids').val();
+    var name =$('#name').val();
+    var description =$('#description').val();
+    
+    $.ajax({
+      headers: {
+                       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                   },
+      type: 'post',
+      url: '/todo/update',
+      data: {
+        id:id,
+        name:name,
+      description:description
+      },
+      success: function (response) {
+        if(response.status){
+          location.reload();
+          $('#todomodal').modal('hide');
+        }
+        } ,
+      error:function(error){
+        if(error.responseJSON && error.responseJSON.errors){
+          var errors = error.responseJSON.errors;
+          if(errors.name){
+            $('#name').addClass('is_invalid');
+            $('#name_error').text(errors.name);
+          }
+        }
+        // console.log(error);
+      }
+    });
+  }
+
 </script>
 
 {{-- todo delete sweetalert --}}
@@ -449,36 +544,81 @@ $(document).ready(function () {
         });
     });
 });
-
-  // $('.show_confirm').click(function(event) {
-  //      var form =  $(this).closest("form");
-  //      var name = $(this).data("name");
-  //      event.preventDefault();
-  //      swal({
-  //          title: `Are you sure you want to delete this record?`,
-  //          text: "If you delete this, it will be gone forever.",
-  //          icon: "warning",
-  //          buttons: true,
-  //          dangerMode: true,
-  //      })
-  //      .then((willDelete) => {
-  //        if (willDelete) {
-  //          form.submit();
-  //        }
-  //      });
-  //  });
 </script>
 
 {{-- edit data --}}
 <script>
-  function Task_edit(id,todo_id,prioriti) {
-        
-      $('#id').val(id), 
-      $('#todo_id').val(todo_id), 
-      // $('#status').val(status), 
-      $('#prioriti').val(prioriti), 
-     $('#myModaltask').modal('show');
+  function Task_edit(id,todo_id,prioriti,task_name,user_name) {
+     
+      var id = id;
+     
+      $.ajax({
+              headers: {
+             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+        // url: "http://127.0.0.1:8000/task/edit/"+id,
+        url: '/task/edit/'+id,
+        type: 'get',
+        success: function (response) {
+          console.log(response);
+          $('#id').val(response.id);
+          $('#todo_id').val(response.todo_id);
+          $('#task_name').val(response.task_name);
+          $('#prioriti').val(response.prioriti);
+          var selectedValues = response.user_name;
+          var temp = new Array();
+          temp = selectedValues.split(",");
+          // console.log(temp)
+          // Set the selected values in the Select2 dropdown
+          $('#user_name').val(temp).trigger('change');
 
+          $('#myModaltask').modal('show');
+        },
+        error: function (error) {
+          console.log(error);
+            Swal.fire('Oops...', "Something went wrong with AJAX!", "error");
+        }
+    });
+      // $('#todo_id').val(todo_id), 
+      // $('#task_name').val(task_name), 
+      // // $('#user_name').val([]),
+      // $('#user_name').val(user_name),
+      // $('#prioriti').val(prioriti), 
+     
+         
+  }
+
+  function task_updates(){
+    var id = $('#id').val();
+    var todo_id = $('#todo_id').val();
+    var task_name = $('#task_name').val();
+    var prioriti = $('#prioriti').val();
+    var user_name = $('#user_name').val();
+    
+
+          $.ajax({
+            headers: {
+                       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                   },
+            type: 'post',
+            url: '/task/update',
+            data: {
+              id: id ,
+              todo_id: todo_id,
+              task_name: task_name,
+              prioriti :  prioriti,
+              user_name:user_name,
+
+            },
+           
+            success: function (response) {
+              if(response.success)
+              location.reload();
+              $('#myModaltask').modal('hide');
+            }, error:function (error){
+              console.log(error);
+            }
+          });
   }
 </script>
 {{-- edit data end --}}
@@ -487,11 +627,29 @@ $(document).ready(function () {
 <script>
   $(document).ready(function() {
     $('#todo_select_id').select2({
-      sorter: data => data.sort((a, b) => a.text.localeCompare(b.text)),
+      // sorter: data => data.sort((a, b) => a.text.localeCompare(b.text)),
     });
   });
 </script>
 {{-- todo select2 end--}}
+{{-- user select2 start --}}
+<script>
+  $(document).ready(function() {
+    $('.assigned_select').select2({
+      multiple: true,
+    });
+  });
+</script>
+
+
+<script>
+  $(document).ready(function() {
+    $('.test').select2({
+      dropdownParent: $("#myModaltask")
+    });
+  });
+</script>
+{{-- user select2 end --}}
 
 {{-- status change start --}}
 <script>
@@ -530,28 +688,5 @@ $(document).ready(function () {
     })
 }
 </script>
-{{-- <script>
-  function statusChange(el,id) {
-    var newStatus = el.value;
-  
-      $.ajax({
-  headers: {
-             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-  type: 'get',
-  url: '{{route("status.change")}}',
-  data: {
-    task_id: id,
-    newStatus: newStatus
-  },
-  success: function (data){
-    console.log(data.message);
-  },
-  error: function (error) {
-            console.error("Error updating status:", error);
-        }
-});
-  }
-</script> --}}
-{{-- status change end --}}
+
 @endsection

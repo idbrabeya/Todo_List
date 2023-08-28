@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('task_name')->nullable();
             $table->string('status');
             $table->string('prioriti')->nullable();
+            $table->string('current_dates')->nullable();
             $table->string('start_date')->nullable();
             $table->string('end_date')->nullable();
             $table->timestamps();

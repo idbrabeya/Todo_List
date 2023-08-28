@@ -6,6 +6,7 @@
               <div class="card">
                   <div class="card-header bg-info justify-content-between d-flex">
                       <h4>USER LIST</h4>
+                      <a href="{{ route('todo.list') }}" class="btn btn-warning btn-sm" >Go Back</a>
                   </div>
       
                   <div class="card-body">
